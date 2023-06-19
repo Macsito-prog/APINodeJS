@@ -142,6 +142,8 @@ app.get("/proveedores/:rutProveedor/ordenes-compra", (req, res) => {
   });
 });
 
+
+
 //RUTAS POST
 
 //generar el detalle de una orden de compra
