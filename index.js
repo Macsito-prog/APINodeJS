@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const sql = require("msnodesqlv8");
+const cors = require('cors')
 
 const bdconnect = {
   database: "gestionComercial",
@@ -18,6 +19,7 @@ const connectionString = `Driver={SQL Server Native Client 11.0};Server=${
 };`;
 
 app.use(express.json());
+app.use(cors());
 
 //ruta para obtener las ordenes de compra
 
@@ -166,7 +168,7 @@ app.post("/orden-compra/:idOrdenCompra/detalle", (req, res) => {
     conn.query(query, (err, rows) => {
       if (err) {
         console.error(err);
-        return res.status(500).send("Error al ejecutar la consult.");
+        return res.status(500).send("Error al ejecutar la consulta.");
       }
 
       res.json({
@@ -175,11 +177,10 @@ app.post("/orden-compra/:idOrdenCompra/detalle", (req, res) => {
 
       conn.close();
     });
-
-    // respuesta exitosa
-    res.status(200).send("Orden de compra generada correctamente");
   });
 });
+
+
 
 app.post("/ordenes-compra", (req, res) => {
   const rutProveedor = req.body.rutProveedor;
@@ -190,23 +191,29 @@ app.post("/ordenes-compra", (req, res) => {
 
   sql.open(connectionString, (err, conn) => {
     if (err) {
-      console.error("error al conectar con la base de datos");
+      console.error("Error al conectar con la base de datos");
+      return res.status(500).send("Error al conectar con la base de datos");
     }
 
-    const query = `INSERT INTO ORDEN_COMPRA (RUT_PROVEEDOR) VALUES ('${rutProveedor}')`;
+    const query = `INSERT INTO ORDEN_COMPRA (RUT_PROVEEDOR) OUTPUT INSERTED.ID_ORDEN_COMPRA VALUES ('${rutProveedor}')`;
 
     conn.query(query, (err, rows) => {
       if (err) {
         console.error(err);
-        return res.status(500).send("Error al ejecutar la consult.");
+        return res.status(500).send("Error al ejecutar la consulta");
       }
-
-      res.json({ message: "Orden de compra agregada correctamente" });
-
+    
+      const orderId = rows[0].ID_ORDEN_COMPRA;
+    
+      res.json({ message: "Orden de compra agregada correctamente", orderId });
+    
       conn.close();
     });
+    
+    
   });
 });
+
 
 
 
