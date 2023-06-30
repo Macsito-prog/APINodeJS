@@ -5,14 +5,14 @@ const cors = require('cors')
 
 const bdconnect = {
   database: "gestionComercial",
-  server: "DESKTOP-FDUSN85\\SQLEXPRESS",
+  server: "G10V4NNY\\SQLEXPRESS",
   driver: "msnodesqlv8",
   options: {
     trustedConnection: true,
   },
 };
 
-const connectionString = `Driver={SQL Server Native Client 11.0};Server=${
+const connectionString = `Driver={SQL Server};Server=${
   bdconnect.server
 };Database=${bdconnect.database};Trusted_Connection=${
   bdconnect.options.trustedConnection ? "Yes" : "No"
@@ -125,9 +125,10 @@ app.get("/proveedores/:rutProveedor/ordenes-compra", (req, res) => {
     }
 
     const query = `
-      SELECT OC.ID_ORDEN_COMPRA, OC.RUT_PROVEEDOR, DOC.ID_DETALLE_ORDEN, DOC.ID_PRODUCTO, DOC.CANTIDAD
+      SELECT OC.ID_ORDEN_COMPRA, OC.RUT_PROVEEDOR, DOC.ID_DETALLE_ORDEN, PRO.NOMBRE_PRODUCTO, DOC.CANTIDAD 
       FROM ORDEN_COMPRA OC
       INNER JOIN DETALLE_ORDEN_COMPRA DOC ON OC.ID_ORDEN_COMPRA = DOC.ID_ORDEN_COMPRA
+      INNER JOIN PRODUCTO PRO ON PRO.ID_PRODUCTO = DOC.ID_PRODUCTO
       WHERE OC.RUT_PROVEEDOR = '${rutProveedor}'
     `;
 
